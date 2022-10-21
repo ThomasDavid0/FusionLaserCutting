@@ -7,11 +7,14 @@
 #from .paletteShow import entry as paletteShow
 #from .paletteSend import entry as paletteSend
 from .groupBodies import entry as groupBodies
+from .laserCuttingsketch import entry as laserCuttingsketch
+
 
 # TODO add your imported modules to this list.
 # Fusion will automatically call the start() and stop() functions.
 commands = [
-    groupBodies
+    groupBodies,
+    laserCuttingsketch
 #    commandDialog,
  #   paletteShow,
  #   paletteSend

@@ -3,6 +3,7 @@ import adsk.core
 import os
 from ...lib import fusion360utils as futil
 from ... import config
+from ...lib.nesting import sort_bodies
 
 app = adsk.core.Application.get()
 ui = app.userInterface
@@ -91,7 +92,10 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
 
     # TODO ******************************** Define your UI Here ********************************
      
-    inputs.addSelectionInput('select_input', 'Bodies ', 'Select bodies to group')
+    select_input = inputs.addSelectionInput('select_input', 'Bodies ', 'Select bodies to group')
+    select_input.addSelectionFilter("SolidBodies")
+    select_input.setSelectionLimits(0)
+
 
 # This function will be called when the user hits the OK button in the command dialog
 def command_execute(args: adsk.core.CommandEventArgs):
@@ -101,13 +105,17 @@ def command_execute(args: adsk.core.CommandEventArgs):
     inputs = args.command.commandInputs
 
     # TODO ******************************** Your code here ********************************
-
+    
     # Get a reference to your command's inputs
     select_input: adsk.core.SelectionCommandInput = inputs.itemById('select_input')
 
-    bods = [b.name for b in select_input.value]
+    sort_bodies(
+        app.activeDocument.design.rootComponent, 
+        [select_input.selection(i).entity for i in range(select_input.selectionCount)]
+    )
 
-    ui.messageBox(bods[0])
+
+
 
 
 # This function will be called when the command needs to compute a new preview in the graphics window

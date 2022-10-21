@@ -1,4 +1,17 @@
 # Assuming you have not changed the general structure of the template no modification is needed in this file.
+from .install_requirements import pip_install, setup_install
+from pathlib import Path
+
+pip_install(["numpy", "pandas", "scipy"])
+
+setup_install([
+    Path(__file__).parent / "geometry", 
+    Path(__file__).parent / "AircrafDesign", 
+    ])
+
+from .lib.special_utils import tag_methods
+tag_methods()
+
 from . import commands
 from .lib import fusion360utils as futil
 

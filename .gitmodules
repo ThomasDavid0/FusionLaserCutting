@@ -1,0 +1,6 @@
+[submodule "geometry"]
+	path = geometry
+	url = git@github.com:PyFlightCoach/geometry.git
+[submodule "AircrafDesign"]
+	path = AircrafDesign
+	url = git@github.com:ThomasDavid0/AircrafDesign.git

@@ -6,7 +6,6 @@ pip_install(["numpy", "pandas", "scipy"])
 
 setup_install([
     Path(__file__).parent / "geometry", 
-    Path(__file__).parent / "AircrafDesign", 
     ])
 
 from .lib.special_utils import tag_methods

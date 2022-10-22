@@ -130,11 +130,9 @@ def command_execute(args: adsk.core.CommandEventArgs):
     osketch = Sketch.get_or_create(app.activeDocument.design.activeComponent, "laser_sketch", sketch_plane)
 
     length = 0
-    tabs = []
-    cut_curves = []
-    projected_curves = []
-    for face in faces:
     
+    for i, face in enumerate(faces):
+        print(f"Face {i} of {len(faces)}")
         curves = []
         directions = []
         for ploop in face.loops:
@@ -143,17 +141,19 @@ def command_execute(args: adsk.core.CommandEventArgs):
             ps = Point([Point(p.x, p.y, p.z), Point(p2.x, p2.y, p2.z)]).mean()
             d = adsk.core.Point3D.create(**ps.to_dict())
 
-            projected_curves = [osketch.project(edge)[0] for edge in ploop.edges]
-            
-            for curve in projected_curves:
-                curve.isConstruction = True
+            edges = full_obj_collection([edge for edge in ploop.edges])
 
+            projected_curves = osketch.project(edges)# [osketch.project(edge)[0] for edge in ploop.edges]
+            
             offset_curves = osketch.offset(
-                full_obj_collection(projected_curves),
+                projected_curves, #full_obj_collection(projected_curves),
                 osketch.modelToSketchSpace(d),
                 kerf_width_input.value if not ploop.isOuter else - kerf_width_input.value
             )
             
+            for curve in projected_curves:
+                curve.deleteMe()
+
             for curve in offset_curves:
                 for _ in range(curve.geometricConstraints.count):
                     if curve.geometricConstraints[0].isDeletable:
@@ -198,11 +198,11 @@ def command_execute(args: adsk.core.CommandEventArgs):
             if ntabs == 0:
                 if longest.length > tap_width_input.value:
                     pm = Edge.p3d_at_r(longest.geometry, 0.5)
-                    tabs.append([
+                    tabs = [
                         Edge.offset_p3d(longest.geometry, pm, - tap_width_input.value / 2),
                         Edge.offset_p3d(longest.geometry, pm, tap_width_input.value / 2)
-                    ])
-                    cut_curves = SketchCurve.split_at_p3ds(longest, tabs[-1])
+                    ]
+                    cut_curves = SketchCurve.split_at_p3ds(longest, tabs)
                     SketchCurve.delete_alternate(cut_curves)
 
     osketch.areConstraintsShown = False

@@ -9,10 +9,10 @@ from time import sleep
 
 
 
-
+ 
 class SketchCurve:
     @staticmethod
-    def split_at_p3ds(curve, p3ds):
+    def split_at_p3ds(curve: adsk.fusion.SketchCurve, p3ds):
         next_curve = curve
         cut_curves = []
         #print(f"cutting {next_curve.objectType} of length {next_curve.length} at {len(p3ds)} points")
@@ -21,20 +21,24 @@ class SketchCurve:
             cutl = Edge.l_at_p3d(next_curve.geometry, p)
             #print(f"{next_curve.objectType}, l={next_curve.length}, cutl={cutl}")
             this_cut = next_curve.split(p, False)
-            if this_cut.count < 2:
+            if this_cut.count == 0:
+                print(f"no curves returned")
+                pass#next_curve = next_curve.trim(p)[0]
+            elif this_cut.count == 1:
                 print(f"only 1 curve returned")
                 pass
-            
-            if abs(cutl - this_cut[0].length) < abs(cutl - this_cut[1].length):
-                next_curve = this_cut[1]
-                cut_curves.append(this_cut[0])    
-            else:
-                next_curve = this_cut[0]
-                cut_curves.append(this_cut[1])    
+            elif this_cut.count == 2:
+                if abs(cutl - this_cut[0].length) < abs(cutl - this_cut[1].length):
+                    next_curve = this_cut[1]
+                    cut_curves.append(this_cut[0])    
+                else:
+                    next_curve = this_cut[0]
+                    cut_curves.append(this_cut[1])    
 
             #print(f"cut_curve: l={cut_curves[-1].length}")
             #print(f"next_curve: l={next_curve.length}")
-        cut_curves.append(this_cut[0])
+        if this_cut.count > 0:
+            cut_curves.append(this_cut[0])
         return cut_curves
 
     @staticmethod
